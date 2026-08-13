@@ -62,6 +62,21 @@ html, body {
   color: var(--accent);
 }
 
+.yesterday {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+  background: rgba(152, 161, 179, .10);
+  padding: 8px 12px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.yesterday strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+
 .tasks {
   margin: 12px 0 0 0;
   list-style: none;

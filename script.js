@@ -25,10 +25,10 @@ const ATIVIDADES = {
     "Recolher: Lixo Banheiro (caso sujo)",
   ],
   4: [ // Quinta
-    "Balcões",
-    "Fogão",
-    "Lixo Orgânico",
-    "Escorredor",
+    "Pano: Balcões",
+    "Pano: Fogão",
+    "Recolher: Lixo Orgânico",
+    "Limpar: Escorredor",
   ],
   5: [ // Sexta
     "Varrer + Pano: Chão Cozinha",
@@ -63,6 +63,16 @@ function responsavel(date) {
   return PESSOAS[i];
 }
 
+// Retorna a última data anterior a `date` que teve responsável (pula fins de semana).
+function ultimoDiaUtilAnterior(date) {
+  const cur = startOfDay(date);
+  cur.setDate(cur.getDate() - 1);
+  while (cur.getDay() === 0 || cur.getDay() === 6) {
+    cur.setDate(cur.getDate() - 1);
+  }
+  return cur;
+}
+
 const atividadesDoDia = (date) => ATIVIDADES[date.getDay()] || [];
 
 const fmtLongo = new Intl.DateTimeFormat("pt-BR", {
@@ -83,6 +93,15 @@ document.getElementById("dateLabel").textContent = cap(fmtLongo.format(hoje));
 
 const pessoa = responsavel(hoje);
 document.getElementById("personName").textContent = pessoa || "Sem escala (fim de semana)";
+
+const ontem = ultimoDiaUtilAnterior(hoje);
+const pessoaOntem = responsavel(ontem);
+const ontemLabel = document.getElementById("yesterdayLabel");
+if (pessoaOntem) {
+  ontemLabel.innerHTML = `Ontem: <strong>${pessoaOntem}</strong> (${fmtCurto.format(ontem)})`;
+} else {
+  ontemLabel.textContent = "Ontem não houve escala";
+}
 
 const lista = document.getElementById("taskList");
 const tarefas = atividadesDoDia(hoje);
