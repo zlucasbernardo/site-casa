@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Escala de Limpeza | Atividades do dia</title>
+    <meta name="description" content="Veja as atividades de limpeza do dia e quem é o responsável, com a escala completa do mês." />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="head">
+        <p class="kicker">Escala de Limpeza</p>
+        <h1 id="dateLabel">—</h1>
+      </header>
+
+      <section class="card person">
+        <p class="label">Responsável de hoje</p>
+        <p class="name" id="personName">—</p>
+      </section>
+
+      <section class="card">
+        <p class="label">Atividades</p>
+        <ol class="tasks" id="taskList"></ol>
+      </section>
+
+      <button class="btn" id="openBtn" type="button">Ver escala do mês</button>
+
+      <footer class="foot">Rodízio contínuo de 6 pessoas nos dias úteis.</footer>
+    </main>
+
+    <div class="overlay" id="overlay" hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="monthTitle">
+        <div class="sheet-head">
+          <h2 id="monthTitle">Escala do mês</h2>
+          <button class="close" id="closeBtn" type="button" aria-label="Fechar">×</button>
+        </div>
+        <div class="sheet-body">
+          <table class="month" id="monthTable"></table>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
