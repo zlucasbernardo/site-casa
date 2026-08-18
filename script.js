@@ -10,7 +10,7 @@ const ATIVIDADES = {
     "Varrer + Pano: Chão Cozinha",
     "Pano: Mesa",
     "Recolher: Lixo Reciclável",
-    "Colocar BIN na Rua",
+    "Colocar BIN na Rua", // substituído dinamicamente (alterna a cada semana)
   ],
   2: [ // Terça
     "Varrer: Escada",
@@ -73,7 +73,26 @@ function ultimoDiaUtilAnterior(date) {
   return cur;
 }
 
-const atividadesDoDia = (date) => ATIVIDADES[date.getDay()] || [];
+// Segunda 17/08/2026 = "BIN PRETO"; alterna a cada semana.
+const REF_BIN = new Date(2026, 7, 17);
+const BIN = ["Colocar BIN PRETO na Rua", "Colocar BIN Reciclável + Orgânico na Rua"];
+
+function binDaSegunda(date) {
+  const semanas = Math.round(
+    (startOfDay(date) - startOfDay(REF_BIN)) / (7 * 24 * 60 * 60 * 1000)
+  );
+  return BIN[((semanas % 2) + 2) % 2];
+}
+
+function atividadesDoDia(date) {
+  const base = ATIVIDADES[date.getDay()];
+  if (!base) return [];
+  const lista = base.slice();
+  if (date.getDay() === 1 && startOfDay(date) >= startOfDay(REF_BIN)) {
+    lista[3] = binDaSegunda(date);
+  }
+  return lista;
+}
 
 const fmtLongo = new Intl.DateTimeFormat("pt-BR", {
   weekday: "long",
@@ -125,16 +144,21 @@ function montarMes() {
     const fds = dow === 0 || dow === 6;
     const ehHoje = d === hoje.getDate();
     const classes = [ehHoje ? "today" : "", fds ? "weekend" : ""].filter(Boolean).join(" ");
+    const ats = atividadesDoDia(data);
+    const cols = [0, 1, 2, 3]
+      .map((i) => `<td class="act">${ats[i] || "—"}</td>`)
+      .join("");
     linhas.push(
       `<tr class="${classes}">
         <td>${fmtCurto.format(data)}</td>
         <td>${cap(fmtDiaSemana.format(data).replace(".", ""))}</td>
         <td>${responsavel(data) || "—"}</td>
+        ${cols}
       </tr>`
     );
   }
   document.getElementById("monthTable").innerHTML =
-    `<thead><tr><th>Data</th><th>Dia</th><th>Responsável</th></tr></thead><tbody>${linhas.join("")}</tbody>`;
+    `<thead><tr><th>Data</th><th>Dia</th><th>Responsável</th><th>Ativ. 1</th><th>Ativ. 2</th><th>Ativ. 3</th><th>Ativ. 4</th></tr></thead><tbody>${linhas.join("")}</tbody>`;
   document.getElementById("monthTitle").textContent = "Escala de " + cap(fmtMes.format(hoje));
 }
 montarMes();

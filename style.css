@@ -170,7 +170,7 @@ html, body {
   cursor: pointer;
 }
 
-.sheet-body { overflow: auto; padding: 8px 12px 24px; }
+.sheet-body { overflow: auto; padding: 8px 12px 24px; -webkit-overflow-scrolling: touch; }
 
 table.month { width: 100%; border-collapse: collapse; font-size: 14px; }
 
@@ -186,3 +186,7 @@ table.month th { color: var(--muted); font-size: 12px; text-transform: uppercase
 table.month tr.today td { background: rgba(74, 222, 128, .1); color: var(--accent); font-weight: 700; }
 
 table.month tr.weekend td { color: var(--muted); }
+
+table.month { min-width: 720px; }
+table.month td.act { font-size: 12px; color: var(--muted); min-width: 130px; }
+table.month tr.today td.act { color: var(--fg); font-weight: 600; }
