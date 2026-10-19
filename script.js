@@ -1,5 +1,5 @@
 // ----- Dados -----
-const PESSOAS = ["Vitor", "Caio", "Lucas", "Rafael", "Derick", "Daniel"];
+const PESSOAS = ["Vitor", "Caio", "Lucas", "Micaella", "Derick", "Daniel"];
 
 // Referência: segunda-feira 10/08/2026 = Vitor (índice 0).
 // A rotação avança 1 pessoa por dia útil (seg a sex), de forma contínua.
