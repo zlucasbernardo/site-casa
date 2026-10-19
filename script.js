@@ -1,53 +1,60 @@
 // ----- Dados -----
-const PESSOAS = ["Vitor", "Caio", "Lucas", "Rafael", "Derick", "Daniel"];
+const PESSOAS = ["Vitor", "Caio", "Lucas", "Micaella", "Derick", "Daniel"];
 
 // Referência: segunda-feira 10/08/2026 = Vitor (índice 0).
-// A rotação avança 1 pessoa por dia útil (seg a sex), de forma contínua.
+// Mês em JavaScript é zero-indexed (7 = Agosto).
 const REF = new Date(2026, 7, 10);
 
 const ATIVIDADES = {
   1: [ // Segunda
-    "Varrer + Pano: Chão Cozinha",
-    "Pano: Mesa",
-    "Recolher: Lixo Reciclável",
-    "Colocar BIN na Rua", // substituído dinamicamente (alterna a cada semana)
+    "Varrer e Mopar: Chão Cozinha",
+    "Varrer e Mopar: Hall",
+    "Recolher Lixo Cozinha/Reciclável",
+    "Colocar BIN na Rua",
   ],
   2: [ // Terça
-    "Varrer: Escada",
-    "Varrer: Corredor Principal",
-    "Varrer + Pano: Salão",
+    "Limpar Banheiro Completo",
+    "Recolher Lixo Banheiro",
+    "Recolher Lixo Cozinha/Reciclável",
     "Recolher BIN da Rua",
   ],
   3: [ // Quarta
-    "Varrer + Pano: Chão Banheiro",
-    "Limpar: Privada",
-    "Pano: Box + Espelho + Pia",
-    "Recolher: Lixo Banheiro (caso sujo)",
+    "Limpar (Externo e Interno) AirFryer + Microondas",
+    "Limpar superfícies: Balcões + Fogão + Escorredor + Pia",
+    "Varrer Escada e Entrada",
+    "Recolher Lixo Cozinha/Reciclável",
   ],
   4: [ // Quinta
-    "Pano: Balcões",
-    "Pano: Fogão",
-    "Recolher: Lixo Orgânico",
-    "Limpar: Escorredor",
+    "Varrer e Mopar: Chão Cozinha",
+    "Varrer e Mopar: Hall",
+    "Recolher Lixo Cozinha/Reciclável",
+    "Colocar BIN na Rua",
   ],
   5: [ // Sexta
-    "Varrer + Pano: Chão Cozinha",
-    "Pano: Mesa",
-    "Recolher: Lixo Reciclável",
+    "Limpar Banheiro Completo",
+    "Recolher Lixo Banheiro",
+    "Recolher Lixo Cozinha/Reciclável",
+    "Recolher BIN da Rua",
   ],
 };
 
 // ----- Lógica -----
-const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+// Força horário fixo (meio-dia) para evitar desvios de Horário de Verão (DST)
+const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
 
-// Quantidade de dias úteis entre REF e a data (pode ser negativa).
+// Quantidade de dias úteis entre REF e a data alvo
 function diasUteisDesdeRef(date) {
   const a = startOfDay(REF);
   const b = startOfDay(date);
-  const passo = b >= a ? 1 : -1;
+  
+  if (a.getTime() === b.getTime()) return 0;
+
+  const passo = b > a ? 1 : -1;
   let count = 0;
   const cur = new Date(a);
-  while (cur.getTime() !== b.getTime()) {
+
+  // Comparações seguras (< e >) impedem loops infinitos
+  while ((passo === 1 && cur < b) || (passo === -1 && cur > b)) {
     cur.setDate(cur.getDate() + passo);
     const dow = cur.getDay();
     if (dow >= 1 && dow <= 5) count += passo;
@@ -57,42 +64,13 @@ function diasUteisDesdeRef(date) {
 
 function responsavel(date) {
   const dow = date.getDay();
-  if (dow === 0 || dow === 6) return null;
+  if (dow === 0 || dow === 6) return null; // Fim de semana
   const n = diasUteisDesdeRef(date);
   const i = ((n % PESSOAS.length) + PESSOAS.length) % PESSOAS.length;
   return PESSOAS[i];
 }
 
-// Retorna a última data anterior a `date` que teve responsável (pula fins de semana).
-function ultimoDiaUtilAnterior(date) {
-  const cur = startOfDay(date);
-  cur.setDate(cur.getDate() - 1);
-  while (cur.getDay() === 0 || cur.getDay() === 6) {
-    cur.setDate(cur.getDate() - 1);
-  }
-  return cur;
-}
-
-// Segunda 17/08/2026 = "BIN PRETO"; alterna a cada semana.
-const REF_BIN = new Date(2026, 7, 17);
-const BIN = ["Colocar BIN PRETO na Rua", "Colocar BIN Reciclável + Orgânico na Rua"];
-
-function binDaSegunda(date) {
-  const semanas = Math.round(
-    (startOfDay(date) - startOfDay(REF_BIN)) / (7 * 24 * 60 * 60 * 1000)
-  );
-  return BIN[((semanas % 2) + 2) % 2];
-}
-
-function atividadesDoDia(date) {
-  const base = ATIVIDADES[date.getDay()];
-  if (!base) return [];
-  const lista = base.slice();
-  if (date.getDay() === 1 && startOfDay(date) >= startOfDay(REF_BIN)) {
-    lista[3] = binDaSegunda(date);
-  }
-  return lista;
-}
+const atividadesDoDia = (date) => ATIVIDADES[date.getDay()] || [];
 
 const fmtLongo = new Intl.DateTimeFormat("pt-BR", {
   weekday: "long",
@@ -105,7 +83,7 @@ const fmtMes = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric"
 
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-// ----- Render -----
+// ----- Render Principal -----
 const hoje = new Date();
 
 document.getElementById("dateLabel").textContent = cap(fmtLongo.format(hoje));
@@ -113,57 +91,54 @@ document.getElementById("dateLabel").textContent = cap(fmtLongo.format(hoje));
 const pessoa = responsavel(hoje);
 document.getElementById("personName").textContent = pessoa || "Sem escala (fim de semana)";
 
-const ontem = ultimoDiaUtilAnterior(hoje);
-const pessoaOntem = responsavel(ontem);
-const ontemLabel = document.getElementById("yesterdayLabel");
-if (pessoaOntem) {
-  ontemLabel.innerHTML = `Ontem: <strong>${pessoaOntem}</strong> (${fmtCurto.format(ontem)})`;
-} else {
-  ontemLabel.textContent = "Ontem não houve escala";
-}
-
 const lista = document.getElementById("taskList");
 const tarefas = atividadesDoDia(hoje);
+
+// Mantém a estrutura de lista preservada no DOM
 if (tarefas.length === 0) {
-  lista.outerHTML = '<p class="empty" id="taskList">Nenhuma atividade programada para hoje.</p>';
+  lista.innerHTML = '<li class="empty">Nenhuma atividade programada para hoje.</li>';
 } else {
   lista.innerHTML = tarefas
     .map((t, i) => `<li><span class="num">${i + 1}</span><span>${t}</span></li>`)
     .join("");
 }
 
-// Tabela do mês
+// ----- Tabela do Mês -----
 function montarMes() {
   const ano = hoje.getFullYear();
   const mes = hoje.getMonth();
   const totalDias = new Date(ano, mes + 1, 0).getDate();
   const linhas = [];
+
   for (let d = 1; d <= totalDias; d++) {
     const data = new Date(ano, mes, d);
     const dow = data.getDay();
     const fds = dow === 0 || dow === 6;
-    const ehHoje = d === hoje.getDate();
+
+    // Verificação completa de data (dia, mês e ano)
+    const ehHoje =
+      data.getDate() === hoje.getDate() &&
+      data.getMonth() === hoje.getMonth() &&
+      data.getFullYear() === hoje.getFullYear();
+
     const classes = [ehHoje ? "today" : "", fds ? "weekend" : ""].filter(Boolean).join(" ");
-    const ats = atividadesDoDia(data);
-    const cols = [0, 1, 2, 3]
-      .map((i) => `<td class="act">${ats[i] || "—"}</td>`)
-      .join("");
+
     linhas.push(
       `<tr class="${classes}">
         <td>${fmtCurto.format(data)}</td>
         <td>${cap(fmtDiaSemana.format(data).replace(".", ""))}</td>
         <td>${responsavel(data) || "—"}</td>
-        ${cols}
       </tr>`
     );
   }
+
   document.getElementById("monthTable").innerHTML =
-    `<thead><tr><th>Data</th><th>Dia</th><th>Responsável</th><th>Ativ. 1</th><th>Ativ. 2</th><th>Ativ. 3</th><th>Ativ. 4</th></tr></thead><tbody>${linhas.join("")}</tbody>`;
+    `<thead><tr><th>Data</th><th>Dia</th><th>Responsável</th></tr></thead><tbody>${linhas.join("")}</tbody>`;
   document.getElementById("monthTitle").textContent = "Escala de " + cap(fmtMes.format(hoje));
 }
 montarMes();
 
-// Pop-up
+// ----- Modal / Pop-up -----
 const overlay = document.getElementById("overlay");
 document.getElementById("openBtn").addEventListener("click", () => (overlay.hidden = false));
 document.getElementById("closeBtn").addEventListener("click", () => (overlay.hidden = true));
