@@ -62,21 +62,6 @@ html, body {
   color: var(--accent);
 }
 
-.yesterday {
-  margin-top: 10px;
-  font-size: 13px;
-  color: var(--muted);
-  background: rgba(152, 161, 179, .10);
-  padding: 8px 12px;
-  border-radius: 999px;
-  display: inline-block;
-}
-
-.yesterday strong {
-  color: var(--fg);
-  font-weight: 600;
-}
-
 .tasks {
   margin: 12px 0 0 0;
   list-style: none;
@@ -170,7 +155,7 @@ html, body {
   cursor: pointer;
 }
 
-.sheet-body { overflow: auto; padding: 8px 12px 24px; -webkit-overflow-scrolling: touch; }
+.sheet-body { overflow: auto; padding: 8px 12px 24px; }
 
 table.month { width: 100%; border-collapse: collapse; font-size: 14px; }
 
@@ -186,7 +171,3 @@ table.month th { color: var(--muted); font-size: 12px; text-transform: uppercase
 table.month tr.today td { background: rgba(74, 222, 128, .1); color: var(--accent); font-weight: 700; }
 
 table.month tr.weekend td { color: var(--muted); }
-
-table.month { min-width: 720px; }
-table.month td.act { font-size: 12px; color: var(--muted); min-width: 130px; }
-table.month tr.today td.act { color: var(--fg); font-weight: 600; }
